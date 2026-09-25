@@ -4,6 +4,8 @@ description: "Theme studio for the DeepSeek Harness Web GUI: eight preset styles
 
 # dsh-style-hub
 
+[![CI](https://github.com/Au1314/dsh-style-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Au1314/dsh-style-hub/actions/workflows/ci.yml)
+
 English | [中文](README.zh.md)
 
 ## Summary
@@ -84,7 +86,7 @@ Bundled preset ids: `nord`, `dracula`, `mocha`, `tokyo-night`, `gruvbox-dark`, `
 
 ## The wallpaper library
 
-- **Storage** — one directory under the Host's data dir (`$DSH_HOME/dsh-style-hub`, overridable with `DSH_STYLE_HUB_DIR`): `images/` holds the bytes, `catalogue.json` holds the index.
+- **Storage** — one directory under the Host's data dir (`$DSH_HOME/dsh-style-hub`, overridable with `DSH_STYLE_HUB_DIR`): `wallpapers/` holds the bytes, `index.json` holds the catalogue.
 - **Route** — a single prefix route, `/api/style-hub/wallpapers`, dispatching on its own sub-path: `GET` the catalogue, `POST` an upload, `GET`/`DELETE /:id`.
 - **Accepted uploads** — PNG, JPEG, and WebP identified by magic bytes (the declared content type is never trusted), up to 15 MB.
 - **Safety** — writes require a same-host `Origin`/`Referer`, ids are 32 hex chars and are the only path segment the route will read, and display names are stripped of anything a header or markup context could misread.

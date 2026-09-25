@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # engines: ^22.19.0 || >=24.0.0 — the two supported lines.
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+        env:
+          # The dev tree pins rc.3 against peers ranging >=0.1.5-rc.2, which
+          # npm's resolver refuses without it (see README → Development).
+          npm_config_legacy_peer_deps: "true"
+
+      - name: Typecheck, build, test
+        run: npm run check

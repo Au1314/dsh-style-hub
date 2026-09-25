@@ -4,6 +4,8 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 
 # dsh-style-hub
 
+[![CI](https://github.com/Au1314/dsh-style-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Au1314/dsh-style-hub/actions/workflows/ci.yml)
+
 [English](README.md) | 中文
 
 ## 概述
@@ -84,7 +86,7 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 
 ## 壁纸库
 
-- **存储** —— 宿主数据目录下的一个目录（`$DSH_HOME/dsh-style-hub`，可用 `DSH_STYLE_HUB_DIR` 覆盖）：`images/` 存字节，`catalogue.json` 存索引。
+- **存储** —— 宿主数据目录下的一个目录（`$DSH_HOME/dsh-style-hub`，可用 `DSH_STYLE_HUB_DIR` 覆盖）：`wallpapers/` 存图片字节，`index.json` 存目录索引。
 - **路由** —— 只有一条前缀路由 `/api/style-hub/wallpapers`，按自身子路径分发：`GET` 目录、`POST` 上传、`GET`/`DELETE /:id`。
 - **可接受的上传** —— 按魔数识别的 PNG、JPEG、WebP（声明的 Content-Type 永不被信任），上限 15 MB。
 - **安全** —— 写操作要求同源 `Origin`/`Referer`；id 是 32 位十六进制，也是路由唯一会读取的路径段；展示名会去掉任何可能被响应头或标记上下文误读的字符。
