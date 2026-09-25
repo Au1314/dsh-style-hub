@@ -368,6 +368,13 @@ test('a style id nothing registered refuses to be selected', async () => {
   assert.ok(state.registered.some(definition => definition.id === 'sh:nord'))
 })
 
+test('a bare preset id in the section still selects the registered style', async () => {
+  const { state, settle } = boot()
+  await settle({ enabled: true, themeId: 'nord' })
+  await flush()
+  assert.equal(state.preference, 'sh:nord', 'the section may hold either form of the id')
+})
+
 test('the wallpaper plane appears with the section and leaves with it', async () => {
   const { settle, face } = boot()
   await settle({ enabled: true, wallpaperId: 'b'.repeat(32), wallpaperBlur: 8 })
@@ -377,6 +384,10 @@ test('the wallpaper plane appears with the section and leaves with it', async ()
   const style = document.getElementById('dsh-style-hub-wallpaper')
   assert.ok(style, 'the live rule should be installed')
   assert.ok(style.textContent.includes('filter:blur(8px)'), 'the rule carries the current parameters')
+  assert.ok(
+    style.textContent.includes('url("/api/style-hub/wallpapers/'),
+    'the reference is an <image>, which a bare string is not',
+  )
   assert.ok(style.textContent.includes('/b'.padEnd(33, 'b').slice(0, 32)), 'the rule points at the stored bytes')
 
   face.patch({ wallpaperId: '' })

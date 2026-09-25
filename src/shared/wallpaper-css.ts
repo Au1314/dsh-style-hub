@@ -61,12 +61,14 @@ export function wallpaperUrl(id: string): string {
  */
 export function wallpaperCss(layer: WallpaperLayer, base?: string): string {
   if (!layer.id) return ''
-  const url = `"${wallpaperUrl(layer.id)}"`
+  // A bare string in `background-image` is not an <image>, and the browser
+  // drops the whole declaration for it — the layer would paint nothing.
+  const image = `url("${wallpaperUrl(layer.id)}")`
   const veil = layer.dim > 0 ? `linear-gradient(rgba(0,0,0,${layer.dim}),rgba(0,0,0,${layer.dim})), ` : ''
   const transform = layer.blur > 0 ? ';transform:scale(1.03)' : ''
   const plane =
     `${WALLPAPER_SELECTOR}{position:fixed;inset:0;z-index:-1;pointer-events:none;` +
-    `background-image:${veil}${url};background-size:${layer.fit};background-position:center;` +
+    `background-image:${veil}${image};background-size:${layer.fit};background-position:center;` +
     `background-repeat:no-repeat;opacity:${clampUnit(layer.opacity)};filter:blur(${clampBlur(layer.blur)}px)${transform}}`
   return base ? `html{background-color:${base}}${plane}` : plane
 }

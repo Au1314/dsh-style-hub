@@ -42,7 +42,7 @@ import {
 } from '../shared/wallpaper-css.ts'
 import { StyleHubController, type StyleHubCardFace } from './controller.ts'
 import { en, zh } from './locales.ts'
-import { PRESETS, themeIdOf, THEME_ID_PREFIX } from './palettes.ts'
+import { PRESETS, registryIdOf, themeIdOf, THEME_ID_PREFIX } from './palettes.ts'
 import { STYLE_ELEMENT_ID, installCardStyles } from './styles.ts'
 import { SURFACE_TOKENS, surfacesOf, tokensFor } from './tokens.ts'
 import { StyleHubCard } from './StyleHubCard.tsx'
@@ -215,8 +215,10 @@ function syncTheme(
 ): void {
   const snapshot = ctx.theme.getTheme()
   if (settings.enabled && settings.themeId !== STOCK_THEME) {
-    const known = snapshot.themes.some(theme => theme.id === settings.themeId)
-    if (known && snapshot.preference !== settings.themeId) ctx.theme.setTheme(settings.themeId)
+    // The section names the preset; the registry knows it under its prefix.
+    const registryId = registryIdOf(settings.themeId)
+    const known = snapshot.themes.some(theme => theme.id === registryId)
+    if (known && snapshot.preference !== registryId) ctx.theme.setTheme(registryId)
     writeEngaged(true)
     return
   }

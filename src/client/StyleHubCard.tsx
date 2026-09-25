@@ -13,7 +13,7 @@ import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-cli
 import type { StyleHubCardFace } from './controller.ts'
 import type { StyleHubKey } from './locales.ts'
 import { LOCALE_NS } from '../shared/settings.ts'
-import { findPreset, PRESETS, type PresetId } from './palettes.ts'
+import { findPreset, presetIdOf, PRESETS, themeIdOf, type PresetId } from './palettes.ts'
 import { wallpaperSrc } from './api.ts'
 
 /** Accent used for the colour control's own display when no override is set. */
@@ -44,6 +44,8 @@ export function StyleHubCard(props: StyleHubCardProps): JSX.Element | null {
   const { value } = state
   const locked = !state.writable
   const preset = findPreset(value.themeId)
+  // Whatever form the section stores, the chips compare in preset ids.
+  const active = presetIdOf(value.themeId) ?? value.themeId
 
   return (
     <section className="dshsh-card">
@@ -74,15 +76,15 @@ export function StyleHubCard(props: StyleHubCardProps): JSX.Element | null {
         <div className="dshsh-grid">
           <button
             type="button"
-            className={`dshsh-chip${value.themeId === 'stock' ? ' dshsh-chipOn' : ''}`}
-            aria-pressed={value.themeId === 'stock'}
+            className={`dshsh-chip${active === 'stock' ? ' dshsh-chipOn' : ''}`}
+            aria-pressed={active === 'stock'}
             disabled={locked}
             onClick={() => props.patch({ themeId: 'stock' })}
           >
             <span className="dshsh-chipName">{t('style.stock')}</span>
           </button>
           {PRESETS.map(option => {
-            const on = value.themeId === option.id
+            const on = active === option.id
             return (
               <button
                 key={option.id}
@@ -90,7 +92,7 @@ export function StyleHubCard(props: StyleHubCardProps): JSX.Element | null {
                 className={`dshsh-chip${on ? ' dshsh-chipOn' : ''}`}
                 aria-pressed={on}
                 disabled={locked}
-                onClick={() => props.patch(presetOn(option.id, value.enabled))}
+                onClick={() => props.patch(presetOn(themeIdOf(option.id), value.enabled))}
               >
                 <span className="dshsh-dots">
                   <span className="dshsh-dot" style={{ background: option.palette.bg }} />
@@ -287,7 +289,7 @@ export function StyleHubCard(props: StyleHubCardProps): JSX.Element | null {
  * Picking a style is a wish to see it, so it also switches the feature on;
  * the two land as one ordered pair of writes rather than requiring a second
  * gesture the user did not ask for.
- * @param id - the preset id.
+ * @param id - the registered theme id of the preset.
  * @param enabled - whether the section is already switched on.
  * @returns the fields to write.
  */

@@ -52,7 +52,10 @@ test('the boot rule paints nothing while the feature is off', () => {
 test('the boot rule paints the layer while the feature is on', () => {
   const css = bootWallpaperCss({ ...DEFAULT_SETTINGS, enabled: true, wallpaperId: ID })
   assert.ok(css.includes(WALLPAPER_SELECTOR), 'addresses the namespaced plane')
-  assert.ok(css.includes(`/api/style-hub/wallpapers/${ID}`), 'points at the stored bytes')
+  assert.ok(
+    css.includes(`url("/api/style-hub/wallpapers/${ID}")`),
+    'points at the stored bytes as an <image> — a bare string there is dropped by the browser',
+  )
   assert.ok(!css.includes('html{'), 'leaves the canvas alone on the first paint')
 })
 

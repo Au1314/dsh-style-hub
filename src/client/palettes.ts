@@ -232,9 +232,26 @@ export const PRESET_IDS: ReadonlySet<string> = new Set(PRESETS.map(preset => pre
 
 /**
  * Look one preset up.
- * @param id - preset id.
+ *
+ * The section stores the registered id (`sh:nord`), but a bare preset id is
+ * accepted too: the card used to write one, so a section written before that
+ * was corrected still has to resolve to the same chip.
+ * @param id - registered theme id or preset id.
  * @returns the preset, or undefined when the id is not bundled.
  */
 export function findPreset(id: string): Preset | undefined {
-  return PRESETS.find(preset => preset.id === id)
+  const bare = presetIdOf(id) ?? id
+  return PRESETS.find(preset => preset.id === bare)
+}
+
+/**
+ * Registered theme id for whatever the section stores.
+ *
+ * Ids the registry needs are prefixed; the section may hold either form, and
+ * passing a bare id through would miss the registry and select nothing.
+ * @param id - registered theme id, preset id, or {@link STOCK_THEME}.
+ * @returns the id to look up and select.
+ */
+export function registryIdOf(id: string): string {
+  return id.startsWith(THEME_ID_PREFIX) ? id : themeIdOf(id)
 }
