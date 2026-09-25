@@ -30,13 +30,25 @@ Everything lives in the **Plugins → Style Hub** card. Turning the master switc
 
 ## Install
 
-The package ships two halves and no runtime dependencies of its own beyond `schemastery` and Node built-ins; every DSH service it touches arrives on `ctx`.
+The package wires itself: `dsh.bundle.patch` points at the bundled `cordis.patch.yml`, which inserts **one** host row (`dsh-style-hub`) over whatever layers the profile already composes. The browser half is discovered separately, through the `dsh.client` manifest in `package.json`. Neither half needs a hand-written row.
 
-1. Install the package into your composition (a git URL, or a checkout next to your other plugins).
-2. Add `dsh-style-hub` to your `cordis.yml` plugin list, alongside the other host-plane plugins.
-3. Restart the composition. The Host registers the `style-hub` settings namespace, serves `/api/style-hub/wallpapers`, and answers every page load with the boot wallpaper rule.
+**In a DSH Desktop profile** (the usual way to try it):
 
-The browser half is discovered through the `dsh.client` entry in `package.json`; it needs a web composition that already carries `dsh-client-ui-settings-plugins` (the card's slot), `dsh-client-ui-theme` (the theme registry), and `dsh-client-locale`.
+1. Unpack the package into the profile's `node_modules`, named after the package:
+
+   ```sh
+   cd "$DSH_HOME/profiles/web/node_modules"   # e.g. %APPDATA%/dsh-desktop/harness/profiles/web/node_modules
+   tar -xzf dsh-style-hub-0.1.0.tgz && mv package dsh-style-hub
+   ```
+
+2. In that profile's `package.json`, add `"dsh-style-hub"` to `dependencies` and to `dsh.profile.bundles`.
+3. Re-install the profile (pnpm, hoisted) and restart the app.
+
+**In a composition you own**: add `dsh-style-hub` to the same bundle list that carries `@deepseek-ai/dsh-base` and `@deepseek-ai/dsh-web-app`, install, restart.
+
+**Requirements.** A web composition that already carries `dsh-client-ui-settings-plugins` (the card's slot), `dsh-client-ui-theme` (the theme registry), and `dsh-client-locale`. The runtime peer range is `>=0.1.5-rc.2 <0.2.0`; `npm run build` typechecks against `0.1.5-rc.3`, the first release of that line that ships type declarations.
+
+The Host registers the `style-hub` settings namespace, serves `/api/style-hub/wallpapers`, and answers every page load with the boot wallpaper rule. `webServer` is an *optional* peer: in a profile with no HTTP surface the bundle still loads, and the route plus the boot rule simply stand aside.
 
 ## Use it
 

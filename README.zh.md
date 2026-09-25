@@ -30,13 +30,25 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 
 ## 安装
 
-本包自带两半，除 `schemastery` 与 Node 内置模块外没有自己的运行时依赖；它用到的每个 DSH 服务都通过 `ctx` 注入。
+本包自己接线：`dsh.bundle.patch` 指向随包的 `cordis.patch.yml`，它在组合既有的各层之上插入**一行**宿主条目（`dsh-style-hub`）；浏览器半则由 `package.json` 里的 `dsh.client` 清单另行发现。两半都不需要手写条目。
 
-1. 把包装进你的组合（git URL，或与其它插件并排的检出目录）。
-2. 在 `cordis.yml` 的插件列表里加入 `dsh-style-hub`，与其它宿主平面插件并列。
-3. 重启组合。宿主会注册 `style-hub` 设置命名空间、提供 `/api/style-hub/wallpapers` 路由，并在每次页面渲染时注入开机壁纸规则。
+**在 DSH Desktop 的 profile 里**（最常见的试用方式）：
 
-浏览器半由 `package.json` 里的 `dsh.client` 条目发现；它需要一个已经包含 `dsh-client-ui-settings-plugins`（卡片槽位）、`dsh-client-ui-theme`（主题注册表）和 `dsh-client-locale` 的 Web 组合。
+1. 解包进 profile 的 `node_modules`，目录名与包名一致：
+
+   ```sh
+   cd "$DSH_HOME/profiles/web/node_modules"   # 例如 %APPDATA%/dsh-desktop/harness/profiles/web/node_modules
+   tar -xzf dsh-style-hub-0.1.0.tgz && mv package dsh-style-hub
+   ```
+
+2. 在该 profile 的 `package.json` 里，把 `"dsh-style-hub"` 加进 `dependencies` 与 `dsh.profile.bundles`。
+3. 重新安装该 profile（pnpm，hoisted）并重启应用。
+
+**在你自己拥有的组合里**：把 `dsh-style-hub` 加进与 `@deepseek-ai/dsh-base`、`@deepseek-ai/dsh-web-app` 同一张 bundle 列表，安装后重启。
+
+**要求**：一个已经包含 `dsh-client-ui-settings-plugins`（卡片槽位）、`dsh-client-ui-theme`（主题注册表）与 `dsh-client-locale` 的 Web 组合。运行时 peer 范围是 `>=0.1.5-rc.2 <0.2.0`；`npm run build` 以 `0.1.5-rc.3` 做类型检查——那是该系列首个附带类型声明的版本。
+
+宿主会注册 `style-hub` 设置命名空间、提供 `/api/style-hub/wallpapers` 路由，并在每次页面渲染时注入开机壁纸规则。`webServer` 是**可选** peer：没有 HTTP 层面的 profile 里该 bundle 照样加载，只是路由与开机规则暂时退场。
 
 ## 使用
 

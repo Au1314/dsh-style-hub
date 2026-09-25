@@ -1,0 +1,16 @@
+# dsh-style-hub bundle patch.
+#
+# Applied over the profile's other layers. It contributes ONE host row: the
+# plugin that registers the `style-hub` settings namespace and serves the
+# wallpaper library. The browser half is not listed here — the package's
+# `dsh.client` manifest loads it, keyed on the settings namespace the Host
+# registers.
+#
+# A patch replaces the targeted row's whole `config`, so only an additive
+# `insert` row appears here.
+
+- insert:
+    - id: dsh-style-hub
+      name: dsh-style-hub
+      # `webServer` is not injected: the host half guards its absence with
+      # `ctx.get`, so this bundle also loads in a profile with no HTTP surface.

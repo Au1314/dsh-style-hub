@@ -77,15 +77,19 @@ export function bootWallpaperCss(settings: StyleHubSettings): string {
 }
 
 /**
- * Required services: the carrier that serves the routes. The settings
- * section is acquired when present — without it the wallpaper routes still
- * stand, the section simply falls back to the composition base.
+ * Required services: none.
+ *
+ * The settings section is acquired when present — without it the wallpaper
+ * routes still stand, the section simply falls back to the composition base.
+ * `webServer` is deliberately *not* injected: a profile with no HTTP surface
+ * (headless, TUI) must still load this bundle without failing, so its absence
+ * is guarded at the registration site instead of at the composition site.
  */
-export const inject = ['webServer']
+export const inject: string[] = []
 
 /**
  * Compose the Host half.
- * @param ctx - plugin context; `webServer` is ready here.
+ * @param ctx - plugin context. `webServer` is optional (see {@link inject}).
  */
 export function apply(ctx: Context): void {
   let scope: SettingsScope<StyleHubSettings> | undefined
@@ -98,7 +102,10 @@ export function apply(ctx: Context): void {
 
   const store = new ImageStore(resolveDataDir(ctx))
   const route = createRoute(store)
-  ctx.effect(() => ctx.webServer.register(route), `dsh-style-hub: ${route.path}`)
+  const web = ctx.get('webServer')
+  if (!web) return
+
+  ctx.effect(() => web.register(route), `dsh-style-hub: ${route.path}`)
 
   ctx.on('webserver/index-inject', table => {
     // Read live: the rows must reflect the section as it stands at this render.
