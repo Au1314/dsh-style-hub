@@ -1,0 +1,10 @@
+# Sources are not published: the package ships the built halves and the
+# declaration tree. `.npmignore` exists so `.gitignore` (which keeps `lib/`
+# out of version control) is not consulted as the publish filter instead.
+src/
+test/
+scripts/
+tsconfig.json
+tsconfig.build.json
+node_modules/
+*.tgz
