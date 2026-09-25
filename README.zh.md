@@ -18,8 +18,23 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 
 入口在 **设置 → 插件 → 插件配置 → Style Hub**。主开关关闭后，外观会完全恢复原样：本插件从不替你的部署决定「正常」长什么样。
 
+## 效果图
+
+设置 → 插件 → 插件配置，当前选中 **Dracula** 预设：
+
+<img src="docs/images/style-hub-card.png" alt="风格中心卡片：预设选择、强调色与面板透明度" width="560">
+
+同一张卡片的壁纸区——上传、填充方式、不透明度、模糊与压暗：
+
+<img src="docs/images/style-hub-wallpaper.png" alt="壁纸区：上传、填充方式、不透明度、模糊与压暗" width="560">
+
+置于设置弹窗中的整体观感：
+
+<img src="docs/images/style-hub-settings.png" alt="设置弹窗停在插件页" width="640">
+
 ## 目录
 
+- [效果图](#效果图)
 - [安装](#安装)
 - [使用](#使用)
 - [设置项参考](#设置项参考)
@@ -47,6 +62,8 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 3. 重新安装该 profile（pnpm，hoisted）并重启应用。
 
 **在你自己拥有的组合里**：把 `dsh-style-hub` 加进与 `@deepseek-ai/dsh-base`、`@deepseek-ai/dsh-web-app` 同一张 bundle 列表，安装后重启。
+
+> **DSH Desktop 提示**：桌面端插件市场在安装/升级任意插件时，会用自己的清单**重写** `dsh.profile.bundles`，并剪掉它不认识的条目。若卡片在一次市场操作后消失，请检查该列表里是否还有 `"dsh-style-hub"`，然后重启应用。
 
 **要求**：一个已经包含 `dsh-client-ui-settings-plugins`（卡片槽位）、`dsh-client-ui-theme`（主题注册表）与 `dsh-client-locale` 的 Web 组合。运行时 peer 范围是 `>=0.1.5-rc.2 <0.2.0`；`npm run build` 以 `0.1.5-rc.3` 做类型检查——那是该系列首个附带类型声明的版本。
 
@@ -109,6 +126,7 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 - **首帧可能短暂显示原生配色。** 壁纸会注入 `index.html`，配色不会：选定风格落地前可能有一瞬闪烁。开机配色注入是已知的后续改进。
 - **风格生效期间手动改「外观」会被拉回。** 这是刻意的——功能开着，就该由风格说了算；而那次新选择会被记住，作为日后归还的偏好。想自己掌控「外观」，关掉主开关即可。
 - **不存在 `menuBlur`。** 见上文[设计取舍](#设计取舍)。
+- **别的插件的玻璃会把浅色预设洗灰。** `wallpaper-engine` 用自己的持久化「玻璃颜色」（`--we-glass-color`）给设置弹窗上色，而该值在**两种外观下都生效**。若浅色预设生效时它仍是深夜蓝默认值，弹窗会读成一片平灰。到该插件的设置里选白色玻璃（或关掉窗口玻璃）即可。
 
 ## 开发
 

@@ -18,8 +18,23 @@ English | [中文](README.zh.md)
 
 Everything lives in the **Plugins → Style Hub** card. Turning the master switch off restores the appearance exactly as it was: this plugin never decides what "normal" looks like for your deployment.
 
+## Screenshots
+
+Settings → Plugins → Plugin configuration, with the **Dracula** preset active:
+
+<img src="docs/images/style-hub-card.png" alt="The Style Hub card: preset chips, accent and panel opacity" width="560">
+
+The wallpaper section of the same card — upload, fit, opacity, blur and dim:
+
+<img src="docs/images/style-hub-wallpaper.png" alt="The wallpaper section: upload, fit, opacity, blur and dim" width="560">
+
+The same card in context, inside the settings dialog:
+
+<img src="docs/images/style-hub-settings.png" alt="Settings dialog open on the plugins page" width="640">
+
 ## Table of Contents
 
+- [Screenshots](#screenshots)
 - [Install](#install)
 - [Use it](#use-it)
 - [Settings reference](#settings-reference)
@@ -47,6 +62,8 @@ The package wires itself: `dsh.bundle.patch` points at the bundled `cordis.patch
 3. Re-install the profile (pnpm, hoisted) and restart the app.
 
 **In a composition you own**: add `dsh-style-hub` to the same bundle list that carries `@deepseek-ai/dsh-base` and `@deepseek-ai/dsh-web-app`, install, restart.
+
+> **DSH Desktop note.** The desktop market's projection (`dsh-desktop-market-installer`) rewrites `dsh.profile.bundles` from its own inventory whenever it installs or upgrades a plugin, pruning entries it does not recognise. If the card goes missing after a market operation, check that `"dsh-style-hub"` is still in that list and restart the app.
 
 **Requirements.** A web composition that already carries `dsh-client-ui-settings-plugins` (the card's slot), `dsh-client-ui-theme` (the theme registry), and `dsh-client-locale`. The runtime peer range is `>=0.1.5-rc.2 <0.2.0`; `npm run build` typechecks against `0.1.5-rc.3`, the first release of that line that ships type declarations.
 
@@ -109,6 +126,7 @@ The Host renders the same wallpaper rule into `index.html` as an injection row, 
 - **The first paint can show the stock palette.** The wallpaper is injected into `index.html`, but the colour scheme is not: there can be a beat before the selected style lands. Injecting the boot palette is a known follow-up.
 - **Changing Appearance while a style is active snaps back.** That is deliberate — the feature is on, so the style wins — and the new Appearance choice is remembered as the preference to restore. Turn the master switch off to steer Appearance yourself.
 - **`menuBlur` does not exist.** See [Design decisions](#design-decisions).
+- **Another plugin's glass can wash out a light preset.** `wallpaper-engine` colours the settings dialog through its own persisted glass colour (`玻璃颜色` → `--we-glass-color`), and that value is used in *both* appearances. Left on its dark default while a light preset is active, the dialog reads as flat grey. Pick the white glass (or turn the window glass off) in that plugin's settings.
 
 ## Development
 
