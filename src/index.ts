@@ -77,51 +77,55 @@ export function bootWallpaperCss(settings: StyleHubSettings): string {
 }
 
 /**
- * Required services: none.
+ * Required services: none at composition time.
  *
- * The settings section is acquired when present — without it the wallpaper
- * routes still stand, the section simply falls back to the composition base.
- * `webServer` is deliberately *not* injected: a profile with no HTTP surface
- * (headless, TUI) must still load this bundle without failing, so its absence
- * is guarded at the registration site instead of at the composition site.
+ * The two services this half uses are both acquired *inside* `apply`, each
+ * with its own local `ctx.inject`: a profile with no HTTP surface (headless,
+ * TUI) must still compose this bundle and serve its settings namespace, so
+ * `webServer` may arrive late or never, and neither case is a failure.
  */
 export const inject: string[] = []
 
 /**
  * Compose the Host half.
- * @param ctx - plugin context. `webServer` is optional (see {@link inject}).
+ * @param ctx - plugin context; `settings` and `webServer` are acquired locally.
  */
 export function apply(ctx: Context): void {
+  const store = new ImageStore(resolveDataDir(ctx))
+  const route = createRoute(store)
   let scope: SettingsScope<StyleHubSettings> | undefined
 
   ctx.inject(['settings'], settingsCtx => {
     scope = settingsCtx.settings.register(SETTINGS_NS, StyleHubSchema, {
       validate: validateSettings,
     })
+    console.log(`[dsh-style-hub] settings namespace "${SETTINGS_NS}" registered`)
   })
 
-  const store = new ImageStore(resolveDataDir(ctx))
-  const route = createRoute(store)
-  const web = ctx.get('webServer')
-  if (!web) return
+  // Not injected at composition time: `apply` runs when this row is loaded,
+  // which can be before the web server provides. Waiting for it here keeps
+  // the rest of the bundle (the settings namespace above) alive in a profile
+  // that never provides one.
+  ctx.inject(['webServer'], webCtx => {
+    webCtx.effect(() => webCtx.webServer.register(route), `dsh-style-hub: ${route.path}`)
+    console.log(`[dsh-style-hub] serving ${route.path}`)
 
-  ctx.effect(() => web.register(route), `dsh-style-hub: ${route.path}`)
-
-  ctx.on('webserver/index-inject', table => {
-    // Read live: the rows must reflect the section as it stands at this render.
-    let settings = DEFAULT_SETTINGS
-    try {
-      settings = scope?.get() ?? DEFAULT_SETTINGS
-    } catch {
-      settings = DEFAULT_SETTINGS
-    }
-    const css = bootWallpaperCss(settings)
-    if (css) {
-      // The element first (so the layer exists by the time the rule below
-      // applies), then the rule.
-      table.push({ kind: 'html', placement: 'body', html: WALLPAPER_ELEMENT })
-      table.push({ kind: 'style', text: css })
-    }
+    webCtx.on('webserver/index-inject', table => {
+      // Read live: the rows must reflect the section as it stands at this render.
+      let settings = DEFAULT_SETTINGS
+      try {
+        settings = scope?.get() ?? DEFAULT_SETTINGS
+      } catch {
+        settings = DEFAULT_SETTINGS
+      }
+      const css = bootWallpaperCss(settings)
+      if (css) {
+        // The element first (so the layer exists by the time the rule below
+        // applies), then the rule.
+        table.push({ kind: 'html', placement: 'body', html: WALLPAPER_ELEMENT })
+        table.push({ kind: 'style', text: css })
+      }
+    })
   })
 }
 
