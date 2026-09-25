@@ -42,11 +42,11 @@ import {
 } from '../shared/wallpaper-css.ts'
 import { StyleHubController, type StyleHubCardFace } from './controller.ts'
 import { en, zh } from './locales.ts'
-import { PRESETS, registryIdOf, themeIdOf, THEME_ID_PREFIX } from './palettes.ts'
+import { PRESETS, registryIdOf, themeIdOf, THEME_ID_PREFIX } from '../shared/palettes.ts'
 import { STYLE_ELEMENT_ID, installCardStyles } from './styles.ts'
-import { SURFACE_TOKENS, surfacesOf, tokensFor } from './tokens.ts'
+import { SURFACE_TOKENS, surfacesOf, tokensFor } from '../shared/tokens.ts'
 import { StyleHubCard } from './StyleHubCard.tsx'
-import { buildTweakLayer, fingerprint, TWEAK_SOURCE, tweakSurfaces } from './tweaks.ts'
+import { buildTweakLayer, fingerprint, TWEAK_SOURCE, tweakSurfaces } from '../shared/tweaks.ts'
 
 /** Id of the stylesheet element carrying the live wallpaper rule. */
 const WALLPAPER_STYLE_ID = 'dsh-style-hub-wallpaper'

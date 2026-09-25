@@ -3,8 +3,9 @@
  *
  * Registers the `style-hub` settings namespace (the join key the settings
  * card is dispatched on), serves the wallpaper library over one prefix route,
- * and answers every index render with the boot wallpaper layer so the first
- * paint already shows the user's picture instead of the stock shell.
+ * and answers every index render with the boot layers: the palette the
+ * selected style resolves to, and the wallpaper layer — so the first paint
+ * already shows the user's style and picture instead of the stock shell.
  *
  * Nothing here imports a DSH package at runtime: the service surfaces arrive
  * on `ctx` and their types come from type-only imports, so the Host half has
@@ -17,6 +18,7 @@ import z from '@deepseek-ai/schemastery'
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { createRoute, ROUTE_PATH } from './routes.ts'
+import { bootPaletteScript } from './shared/boot-palette.ts'
 import { DEFAULT_SETTINGS, SETTINGS_NS, type StyleHubSettings, validateSettings } from './shared/settings.ts'
 import { ID_PATTERN, ImageStore } from './storage.ts'
 import { WALLPAPER_ELEMENT, wallpaperCss, type WallpaperLayer } from './shared/wallpaper-css.ts'
@@ -119,6 +121,10 @@ export function apply(ctx: Context): void {
         settings = DEFAULT_SETTINGS
       }
       const css = bootWallpaperCss(settings)
+      // The palette first: it is the row that makes the first frame ours, and
+      // it must be in the document before the composition's own modules run.
+      const palette = bootPaletteScript(settings)
+      if (palette) table.push({ kind: 'script', placement: 'body', text: palette })
       if (css) {
         // The element first (so the layer exists by the time the rule below
         // applies), then the rule.

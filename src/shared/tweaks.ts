@@ -11,7 +11,7 @@
  * "nothing actually changed" and skip the write that would otherwise emit
  * `theme/change` on every pass.
  */
-import type { StyleHubSettings } from '../shared/settings.ts'
+import type { StyleHubSettings } from './settings.ts'
 import { alpha, darken, lighten, parse } from './color.ts'
 import type { ColorScheme } from './palettes.ts'
 import { STOCK_SURFACES, SURFACE_TOKENS, type Tokens } from './tokens.ts'

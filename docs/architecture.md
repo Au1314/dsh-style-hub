@@ -1,18 +1,19 @@
 # Architecture
 
-`dsh-style-hub` is one package with two halves that never import from each other's DSH surface: the Host half runs in the composition's Node process, the browser half runs in the page, and the only thing they share is the durable `style-hub` section plus the wallpaper wire contract.
+`dsh-style-hub` is one package with two halves that never import from each other's DSH surface: the Host half runs in the composition's Node process, the browser half runs in the page, and the only things they share are the durable `style-hub` section, the pure palette derivation, and the wallpaper wire contract.
 
 ```
 src/
   shared/            settings.ts · wallpaper-css.ts · wallpapers.ts   ← both halves import these
-  index.ts           Host half: schema, storage, route, boot rule
+    palettes · tokens · color · tweaks   ← style derivation: the browser registers it,
+    boot-palette.ts                      ← the Host paints the first frame with it
+  index.ts           Host half: schema, storage, route, boot rows
   routes.ts          the prefix route's dispatch
   storage.ts         the on-disk library
   client/
     index.ts         browser half: registration + reconciliation
     controller.ts    section reads/writes for the card
     StyleHubCard.tsx the card itself
-    palettes · tokens · color · tweaks        ← style derivation
     api · locales · styles                    ← transport, copy, chrome
 ```
 
@@ -34,16 +35,16 @@ Bundle purity holds throughout: **no cross-plugin value imports**. DSH packages 
 
 1. Registers the `style-hub` namespace with `StyleHubSchema` (defaults for every field) plus `validateSettings`, which owns the ranges and the shape checks so a stored document can be re-judged without a schema upgrade.
 2. Opens an `ImageStore` and registers **one** prefix route (`/api/style-hub/wallpapers`). Everything else is dispatched on the route's own sub-path, so there is exactly one registration to reason about.
-3. Subscribes to `webserver/index-inject` and pushes two rows per render: the wallpaper `<div>` (so the first paint has a plane to paint on) and the boot `<style>` row derived from the *current* section.
+3. Subscribes to `webserver/index-inject` and pushes up to three rows per render: the boot `script` row carrying the selected style's token directory (so the first frame is already in that style), the wallpaper `<div>` (so the first paint has a plane to paint on), and the boot `<style>` row derived from the *current* section.
 
-`bootWallpaperCss` refuses an id the storage layer would not have issued (`ID_PATTERN`, 32 hex chars), which is why a stale or hand-edited section paints nothing instead of a broken URL.
+`bootWallpaperCss` refuses an id the storage layer would not have issued (`ID_PATTERN`, 32 hex chars), which is why a stale or hand-edited section paints nothing instead of a broken URL. `bootPaletteScript` refuses anything it would not have registered — the feature off, `stock` selected, or an id the catalogue does not carry — and returns `''` so the row is never pushed.
 
 ### Storage
 
 ```
 $DSH_HOME/dsh-style-hub/
-  images/<id>.<ext>     bytes, named by the id the API issued
-  catalogue.json        the index: id, display name, size, ext, mime, addedAt
+  wallpapers/<id>.<ext>  bytes, named by the id the API issued
+  index.json        the index: id, display name, size, ext, mime, addedAt
 ```
 
 Every public method serializes on one internal promise chain, so callers may fire uploads and deletes without ordering them themselves. Type detection is magic-byte only; a text file renamed `.png` is refused with `400` before anything touches disk.
@@ -87,6 +88,7 @@ Errors that are this plugin's own are written with a `@` prefix (`@wallpaper.too
 `npm test` runs the bundled `test/build/*.test.js`:
 
 - `settings.test.mjs` — the section shape, the ranges, and the boot rule.
+- `boot.test.mjs` — the boot palette row: what it refuses, that its derivation is the browser half's own, and what it writes when a stand-in `document` runs it.
 - `tokens.test.mjs` — required-token coverage (names extracted from the installed design-system stylesheet), no `--dsw-static-*` leakage, tweak-layer contents, fingerprints.
 - `storage.test.mjs` / `routes.test.mjs` — sniffing, round trips, origin and method refusal, `413`.
 - `client.test.mjs` — the built `lib/client.js` is loaded the way the composition loads it (`window.__ModuleLoader__.load`), driven against a stand-in `ctx` and document, and asserted on: what it registers, what it selects, what it restores, and what DOM it owns.

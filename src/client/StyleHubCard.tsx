@@ -13,7 +13,7 @@ import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-cli
 import type { StyleHubCardFace } from './controller.ts'
 import type { StyleHubKey } from './locales.ts'
 import { LOCALE_NS } from '../shared/settings.ts'
-import { findPreset, presetIdOf, PRESETS, themeIdOf, type PresetId } from './palettes.ts'
+import { findPreset, presetIdOf, PRESETS, themeIdOf, type PresetId } from '../shared/palettes.ts'
 import { wallpaperSrc } from './api.ts'
 
 /** Accent used for the colour control's own display when no override is set. */

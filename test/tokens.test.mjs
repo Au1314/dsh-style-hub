@@ -13,15 +13,15 @@ import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import { DEFAULT_SETTINGS } from '../src/shared/settings.ts'
-import { PRESETS, THEME_ID_PREFIX } from '../src/client/palettes.ts'
-import { SURFACE_TOKENS, tokensFor } from '../src/client/tokens.ts'
+import { PRESETS, THEME_ID_PREFIX } from '../src/shared/palettes.ts'
+import { SURFACE_TOKENS, tokensFor } from '../src/shared/tokens.ts'
 import {
   buildTweakLayer,
   fingerprint,
   TWEAK_SOURCE,
   tweakSurfaces,
   WALLPAPER_CANVAS_ALPHA,
-} from '../src/client/tweaks.ts'
+} from '../src/shared/tweaks.ts'
 
 const ROOT = process.cwd()
 

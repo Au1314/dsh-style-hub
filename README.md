@@ -120,10 +120,11 @@ The Host renders the same wallpaper rule into `index.html` as an injection row, 
 
 **One tweak layer.** Accent and translucency are stacked as a single override layer with a fingerprint, so a reconciliation pass that changes nothing writes nothing — and an empty layer is torn down instead of being registered as "applied but empty".
 
+**The first frame is already the style's.** The registry that owns a style exists only once the browser half has registered it, so until then the design system paints the stock palette. The Host derives the same token directory from the section — tweaks included — and injects it as a `script` row that writes it exactly where the presenter writes it: inline variables on `body`, the dark-palette attribute, the root `color-scheme`. Inline declarations beat every stylesheet however it is ordered, and because the names are the presenter's own, switching the feature off retracts this layer along with theirs instead of stranding it.
+
 ## Known limitations
 
 - **The preference is replayed, not persisted.** A style selection lives in the `style-hub` section; the built-in Appearance preference stays `light`/`dark`/`system`. Reloading replays it from the section.
-- **The first paint can show the stock palette.** The wallpaper is injected into `index.html`, but the colour scheme is not: there can be a beat before the selected style lands. Injecting the boot palette is a known follow-up.
 - **Changing Appearance while a style is active snaps back.** That is deliberate — the feature is on, so the style wins — and the new Appearance choice is remembered as the preference to restore. Turn the master switch off to steer Appearance yourself.
 - **`menuBlur` does not exist.** See [Design decisions](#design-decisions).
 - **Another plugin's glass can wash out a light preset.** `wallpaper-engine` colours the settings dialog through its own persisted glass colour (`玻璃颜色` → `--we-glass-color`), and that value is used in *both* appearances. Left on its dark default while a light preset is active, the dialog reads as flat grey. Pick the white glass (or turn the window glass off) in that plugin's settings.
