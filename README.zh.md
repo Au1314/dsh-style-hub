@@ -63,7 +63,7 @@ description: "DeepSeek Harness Web GUI 主题工作台：八套预设风格、�
 
 **在你自己拥有的组合里**：把 `dsh-style-hub` 加进与 `@deepseek-ai/dsh-base`、`@deepseek-ai/dsh-web-app` 同一张 bundle 列表，安装后重启。
 
-> **DSH Desktop 提示**：桌面端插件市场在安装/升级任意插件时，会用自己的清单**重写** `dsh.profile.bundles`，并剪掉它不认识的条目。若卡片在一次市场操作后消失，请检查该列表里是否还有 `"dsh-style-hub"`，然后重启应用。
+> **DSH Desktop 提示**：官方插件列表为每个 bundle 维护一个包开关；拨动它（或市场自行协调）会**同时**改写 `dsh.profile.bundles` 与该 profile 的 `cordis.patch.yml`——增删 `dsh-style-hub` 那一行，好让开关与组合结果保持一致。若卡片在该页面的一次操作后消失，请确认**两个文件**里都还有这条记录，然后重启应用。
 
 **要求**：一个已经包含 `dsh-client-ui-settings-plugins`（卡片槽位）、`dsh-client-ui-theme`（主题注册表）与 `dsh-client-locale` 的 Web 组合。运行时 peer 范围是 `>=0.1.5-rc.2 <0.2.0`；`npm run build` 以 `0.1.5-rc.3` 做类型检查——那是该系列首个附带类型声明的版本。
 

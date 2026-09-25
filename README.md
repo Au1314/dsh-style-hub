@@ -63,7 +63,7 @@ The package wires itself: `dsh.bundle.patch` points at the bundled `cordis.patch
 
 **In a composition you own**: add `dsh-style-hub` to the same bundle list that carries `@deepseek-ai/dsh-base` and `@deepseek-ai/dsh-web-app`, install, restart.
 
-> **DSH Desktop note.** The desktop market's projection (`dsh-desktop-market-installer`) rewrites `dsh.profile.bundles` from its own inventory whenever it installs or upgrades a plugin, pruning entries it does not recognise. If the card goes missing after a market operation, check that `"dsh-style-hub"` is still in that list and restart the app.
+> **DSH Desktop note.** The official plugin list owns a package switch for every bundle, and flipping it (or the market reconciling on its own) rewrites both `dsh.profile.bundles` and this profile's `cordis.patch.yml` — adding or removing the `dsh-style-hub` row so the switch and the composition agree. If the card goes missing after an operation on that page, check that the entry is present in *both* files and restart the app.
 
 **Requirements.** A web composition that already carries `dsh-client-ui-settings-plugins` (the card's slot), `dsh-client-ui-theme` (the theme registry), and `dsh-client-locale`. The runtime peer range is `>=0.1.5-rc.2 <0.2.0`; `npm run build` typechecks against `0.1.5-rc.3`, the first release of that line that ships type declarations.
 
