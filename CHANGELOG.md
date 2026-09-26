@@ -19,8 +19,11 @@ First release.
 - **Wallpaper library** — host-side storage under the plugin's data directory,
   one prefix route (`/api/style-hub/wallpapers`), magic-byte type detection,
   a 15 MB ceiling, and same-host origin checks on writes.
-- **Boot layer** — the Host injects the wallpaper element and rule into every
-  index render, so the first paint already shows the selected picture.
+- **Boot layer** — the Host injects three things into every index render: a
+  script that writes the selected style's variables, `data-ds-dark-theme` and
+  `color-scheme` before first paint (in the same places the presenter tracks,
+  so switching the feature off retracts the layer), plus the wallpaper element
+  and its rule. The first frame is already the style's colours and picture.
 - **Settings card** under **Plugins → Plugin configuration**, keyed by the
   `style-hub` namespace, with zh/en dictionaries.
 - **Switch-off contract** — the preference held before the plugin engaged is

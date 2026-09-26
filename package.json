@@ -62,7 +62,8 @@
     "build": "node scripts/build.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "npm run typecheck && npm run build && node --check lib/index.js && node --check lib/client.js && npm test",
-    "test": "node --test \"test/build/*.test.js\""
+    "test": "node --test \"test/build/*.test.js\"",
+    "prepublishOnly": "npm run check"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
