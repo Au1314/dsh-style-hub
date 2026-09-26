@@ -4,6 +4,18 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Glass-wash detection and fix** — while one of the light styles is active,
+  the card watches `wallpaper-engine`'s settings glass (`--we-glass-color`,
+  read from the live document) and, when that neighbour tint would wash the
+  dialog to flat grey, offers **Switch to white glass**. The write goes
+  through the neighbour's own settings route as a read-merge-write, so every
+  other setting they own survives it; the offer is re-evaluated from the
+  document rather than trusted, so a later edit on their side brings it back.
+
 ## [0.1.0] — 2026-09-25
 
 First release.

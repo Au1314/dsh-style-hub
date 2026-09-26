@@ -127,7 +127,7 @@ The Host renders the same wallpaper rule into `index.html` as an injection row, 
 - **The preference is replayed, not persisted.** A style selection lives in the `style-hub` section; the built-in Appearance preference stays `light`/`dark`/`system`. Reloading replays it from the section.
 - **Changing Appearance while a style is active snaps back.** That is deliberate — the feature is on, so the style wins — and the new Appearance choice is remembered as the preference to restore. Turn the master switch off to steer Appearance yourself.
 - **`menuBlur` does not exist.** See [Design decisions](#design-decisions).
-- **Another plugin's glass can wash out a light preset.** `wallpaper-engine` colours the settings dialog through its own persisted glass colour (`玻璃颜色` → `--we-glass-color`), and that value is used in *both* appearances. Left on its dark default while a light preset is active, the dialog reads as flat grey. Pick the white glass (or turn the window glass off) in that plugin's settings.
+- **Another plugin's glass can wash out a light preset.** `wallpaper-engine` colours the settings dialog through its own persisted glass colour (`玻璃颜色` → `--we-glass-color`), and that value is used in *both* appearances — left dark while a light preset is active, the dialog reads as flat grey. The card detects this while it is happening and offers **Switch to white glass**, which persists the fix through that plugin's own settings route (a read-merge-write of a config file that endpoint replaces wholesale). Changing colours from *its* settings page afterwards reasserts the value that plugin still holds, and the offer reappears.
 
 ## Development
 

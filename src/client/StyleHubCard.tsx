@@ -110,6 +110,31 @@ export function StyleHubCard(props: StyleHubCardProps): JSX.Element | null {
         </div>
       </div>
 
+      {/*
+        The neighbour's glass under a light style: shown only while the wash
+        is actually on, and gone the moment the fix lands — the controller
+        re-reads the document rather than trusting this button's own result.
+      */}
+      {state.glassWash ? (
+        <div className="dshsh-group">
+          <div className="dshsh-field">
+            <span className="dshsh-fieldText">
+              <span className="dshsh-label">{t('glass.label')}</span>
+              <span className="dshsh-hint">{t('glass.hint')}</span>
+            </span>
+            <button
+              type="button"
+              className="dshsh-btn"
+              disabled={locked || state.glassBusy}
+              onClick={() => void props.fixGlass()}
+            >
+              {state.glassBusy ? t('glass.fixing') : t('glass.fix')}
+            </button>
+          </div>
+          {state.glassError ? <div className="dshsh-error">{resolveError(t, state.glassError)}</div> : null}
+        </div>
+      ) : null}
+
       <div className="dshsh-group">
         <label className="dshsh-field">
           <span className="dshsh-fieldText">

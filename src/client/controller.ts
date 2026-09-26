@@ -11,8 +11,10 @@
  */
 import type { SettingsScope } from '@deepseek-ai/dsh-client-ui-settings/client'
 import { DEFAULT_SETTINGS, type StyleHubSettings } from '../shared/settings.ts'
+import { findPreset } from '../shared/palettes.ts'
 import { MAX_UPLOAD_BYTES, type WallpaperInfo } from '../shared/wallpapers.ts'
 import { deleteWallpaper, listWallpapers, uploadWallpaper } from './api.ts'
+import { glassWashesLightStyle, observeGlass, readGlassState, switchToWhiteGlass } from './glass.ts'
 
 /** What the card renders. */
 export interface StyleHubCardState {
@@ -30,6 +32,12 @@ export interface StyleHubCardState {
   busy: boolean
   /** Last failure to surface under the control that caused it. */
   error: string | undefined
+  /** Whether wallpaper-engine's glass is washing an active light style grey. */
+  glassWash: boolean
+  /** Whether the glass fix is crossing the wire. */
+  glassBusy: boolean
+  /** Last failure of the glass fix, shown beside its own control. */
+  glassError: string | undefined
 }
 
 /** The business face the card's slot entry injects. */
@@ -44,6 +52,8 @@ export interface StyleHubCardFace {
   upload: (file: File) => Promise<void>
   /** Remove one image from the library and from the selection. */
   removeWallpaper: (id: string) => Promise<void>
+  /** Persist white glass in wallpaper-engine's settings and repaint it. */
+  fixGlass: () => Promise<void>
 }
 
 /**
@@ -58,6 +68,7 @@ export class StyleHubController {
   private readonly unsubscribeScope: () => void
   private state: StyleHubCardState
   private libraryRequest = 0
+  private disposeGlassObserver: (() => void) | undefined
 
   /** @param scope - the bound scope for the `style-hub` namespace. */
   constructor(scope: SettingsScope<StyleHubSettings>) {
@@ -70,19 +81,25 @@ export class StyleHubController {
       libraryLoading: false,
       busy: false,
       error: undefined,
+      glassWash: false,
+      glassBusy: false,
+      glassError: undefined,
     }
     this.unsubscribeScope = scope.subscribe(() => this.sync())
     this.sync()
   }
 
   /**
-   * Wire the controller: adopt the scope's first snapshot and read the
-   * wallpaper library once.
-   * @returns the disposer releasing the scope subscription and listeners.
+   * Wire the controller: adopt the scope's first snapshot, read the wallpaper
+   * library once, and start watching the neighbour's glass.
+   * @returns the disposer releasing the subscriptions and listeners.
    */
   start(): () => void {
     void this.refresh()
+    this.recheckGlass()
+    this.disposeGlassObserver = observeGlass(() => this.recheckGlass())
     return () => {
+      this.disposeGlassObserver?.()
       this.unsubscribeScope()
       this.listeners.clear()
     }
@@ -158,6 +175,22 @@ export class StyleHubController {
     }
   }
 
+  /**
+   * Clear the wash: persist wallpaper-engine's glass colour as white through
+   * their own route, repaint it, and let the detection confirm the answer
+   * rather than asserting it here.
+   */
+  readonly fixGlass = async (): Promise<void> => {
+    this.publish({ glassBusy: true, glassError: undefined })
+    try {
+      await switchToWhiteGlass()
+      this.publish({ glassBusy: false })
+      this.recheckGlass()
+    } catch {
+      this.publish({ glassBusy: false, glassError: '@glass.failed' })
+    }
+  }
+
   /** Re-read the wallpaper library. */
   private async refresh(): Promise<void> {
     const ticket = ++this.libraryRequest
@@ -181,6 +214,19 @@ export class StyleHubController {
       writable: snapshot.writable,
       value: snapshot.value ?? DEFAULT_SETTINGS,
     })
+    // The section names the style, so a style change can create or dissolve
+    // the conflict on its own — no DOM signal is needed for that half.
+    this.recheckGlass()
+  }
+
+  /**
+   * Ask the document whether the neighbour's glass is washing an active
+   * light style, and publish the answer only when it changed.
+   */
+  private recheckGlass(): void {
+    const preset = findPreset(this.state.value.themeId)
+    const lightStyleActive = this.state.value.enabled && preset?.colorScheme === 'light'
+    this.publish({ glassWash: glassWashesLightStyle(readGlassState(), lightStyleActive) })
   }
 
   /**
@@ -196,7 +242,10 @@ export class StyleHubController {
       merged.wallpapers === this.state.wallpapers &&
       merged.libraryLoading === this.state.libraryLoading &&
       merged.busy === this.state.busy &&
-      merged.error === this.state.error
+      merged.error === this.state.error &&
+      merged.glassWash === this.state.glassWash &&
+      merged.glassBusy === this.state.glassBusy &&
+      merged.glassError === this.state.glassError
     ) {
       return
     }

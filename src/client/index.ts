@@ -96,6 +96,7 @@ export function apply(ctx: ClientContext): void {
     patch: controller.patch,
     upload: controller.upload,
     removeWallpaper: controller.removeWallpaper,
+    fixGlass: controller.fixGlass,
   }
 
   ctx.slots.inject('settings.plugin.item', () =>
