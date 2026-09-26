@@ -10,6 +10,14 @@
     "wallpaper"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Au1314/dsh-style-hub.git"
+  },
+  "homepage": "https://github.com/Au1314/dsh-style-hub#readme",
+  "bugs": {
+    "url": "https://github.com/Au1314/dsh-style-hub/issues"
+  },
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
